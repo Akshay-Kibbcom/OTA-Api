@@ -4,10 +4,12 @@ var path = require('path');
 var router = express.Router();
 var multer = require('multer');
 const fs = require('fs');
+var crypto = require('crypto');
 const dir = './firmware';
 var app = express()
 
 app.use(bodyParser.json());
+var checkSum ;
 
 
 var Storage = multer.diskStorage({
@@ -54,6 +56,18 @@ function getFileExists(filename)
     return promise;
 }
 
+var checksumReturn;
+// Genaret Checksum Function
+function generateChecksum(str, algorithm, encoding) {
+    
+    checksumReturn = crypto
+        .createHash(algorithm || 'md5')
+        .update(str, 'utf8')
+        .digest(encoding || 'hex');
+
+        console.log("Check : "+checksumReturn)
+}
+
 // Get New Version is available of not.
 app.post('/getVersionUpdates', function (req, res) {
     var body=req.body;
@@ -72,14 +86,22 @@ app.post('/getVersionUpdates', function (req, res) {
     var ret=getFileExists(newFile);
 
     var fileExist;
-
+    
     ret.then(function(result){
         console.log("Result: "+result)
-        var response={
-            Result : "New Updates Available",
-            URL : path.resolve("./firmware/"+newFile+".txt")
-        }
-        res.send(response);
+        console.log('./firmware/'+newFile+".txt");
+        
+        fs.readFile('./firmware/'+newFile+".txt", function(err, data) {
+            console.log(data)
+            generateChecksum(data); 
+            console.log(checksumReturn)  
+            var response={
+                Result : "New Updates Available",
+                URL : path.resolve("./firmware/"+newFile+".txt"),
+                Checksum : checksumReturn
+            }
+            res.send(response);
+        });
     },function(err)
     {
         console.log(err)
@@ -101,6 +123,7 @@ app.get('/download/:file(*)',(req, res) => {
     }
     res.send(response) ;
   });
+
 
 app.listen(3000, function () {
     console.log('Magic is happening on port 3000!')
