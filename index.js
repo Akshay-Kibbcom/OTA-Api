@@ -116,7 +116,7 @@ app.post('/getVersionUpdates', function (req, res) {
 // Download a new Firmware
 app.get('/download/:file(*)',(req, res) => {
     var file = req.params.file;
-    var fileLocation = path.resolve("./firmware/"+file);
+    var fileLocation ='firmware/'+file;
     console.log(fileLocation);
     /*var response= {
         url : fileLocation
