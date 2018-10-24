@@ -116,14 +116,17 @@ app.post('/getVersionUpdates', function (req, res) {
 // Download a new Firmware
 app.get('/download/:file(*)',(req, res) => {
     var file = req.params.file;
-    var fileLocation ='firmware/'+file;
-    console.log(fileLocation);
-    /*var response= {
-        url : fileLocation
-    }
-    res.send(response) ;*/
-
-    res.download(fileLocation);
+    fs.readFile('firmware/'+file, function (err, content) {
+        if (err) {
+            res.writeHead(400, {'Content-type':'text/html'})
+            console.log(err);
+            res.end("No such file");    
+        } else {
+            //specify Content will be an attachment
+            res.setHeader('Content-disposition', 'attachment; filename='+file);
+            res.end(content);
+        }
+    });
   });
 
 
