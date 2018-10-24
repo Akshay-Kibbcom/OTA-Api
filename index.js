@@ -97,7 +97,7 @@ app.post('/getVersionUpdates', function (req, res) {
             console.log(checksumReturn)  
             var response={
                 Result : "New Updates Available",
-                URL : path.resolve("./firmware/"+newFile+".txt"),
+                URL : "http://159.65.152.85:4000"+path.resolve("./firmware/"+newFile+".txt"),
                 Checksum : checksumReturn
             }
             res.send(response);
