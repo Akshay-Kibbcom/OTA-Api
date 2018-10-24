@@ -118,10 +118,12 @@ app.get('/download/:file(*)',(req, res) => {
     var file = req.params.file;
     var fileLocation = path.resolve("./firmware/"+file);
     console.log(fileLocation);
-    var response= {
+    /*var response= {
         url : fileLocation
     }
-    res.send(response) ;
+    res.send(response) ;*/
+
+    res.download(fileLocation);
   });
 
 
