@@ -57,6 +57,7 @@ function getFileExists(filename)
 }
 
 var checksumReturn;
+var fileVersions=new Array();
 // Genaret Checksum Function
 function generateChecksum(str, algorithm, encoding) {
     
@@ -67,6 +68,23 @@ function generateChecksum(str, algorithm, encoding) {
 
         console.log("Check : "+checksumReturn)
 }
+// Get Maximum Number
+function getMaxVer()
+{
+    var promise= new Promise(function(resolve,reject){
+        fs.readdir(dir, (err, files) => {
+            files.forEach(file => {
+                var fname= file.slice(0, -4);
+                var ver= fname.split("_")
+                ver=ver[1];
+                fileVersions.push(ver);
+                
+            })
+            return resolve(Math.max(...fileVersions))
+        })
+    });
+    return promise;
+}
 
 // Get New Version is available of not.
 app.post('/getVersionUpdates', function (req, res) {
@@ -74,10 +92,52 @@ app.post('/getVersionUpdates', function (req, res) {
     var filename= body.filename;
     console.log("File in URL Body is : "+filename)
 
-    var lastChar = filename[filename.length-1];
+    // Truncate the Extn
+    var filname= filename.slice(0,-4);
+    console.log("File without EXTN "+filname);
+
+
+    var lastChar = filname.split("_")
+    lastChar=lastChar[1];
+    console.log(lastChar);
     var ver= parseInt(lastChar)
-    ver++;
-    console.log(ver);
+    //ver++;
+    var max=getMaxVer();
+    max.then(function(maxValue){
+        if(maxValue>ver)
+        {
+            var newFile;
+            fs.readdir(dir, (err, files) => {
+                files.forEach(file => {
+                    if(file.indexOf(maxValue) == -1 ?false:true)
+                    {
+                        console.log("Update file name : "+file);
+                        newFile=file;
+                        console.log("./firmware/"+newFile)
+                        fs.readFile('./firmware/'+newFile, function(err, data) {
+                        console.log(data)
+                        generateChecksum(data); 
+                        console.log(checksumReturn)  
+                        var response={
+                                Result : "New Updates Available",
+                                URL : "http://159.65.152.85:4000/download/"+newFile,
+                                Checksum : checksumReturn
+                            }
+                            res.send(response);
+                        });
+                    }
+                })
+
+            })
+        }
+        else{
+            var response ={
+                Result : "No Updates Available, You are upto date"
+            }
+            res.send(response);
+        }
+    })
+    /*console.log(ver);
     var newFile=filename.replace(lastChar,ver);
     console.log(newFile);
     console.log(path.resolve("./firmware/"+newFile+".txt"));
@@ -97,7 +157,7 @@ app.post('/getVersionUpdates', function (req, res) {
             console.log(checksumReturn)  
             var response={
                 Result : "New Updates Available",
-                URL : "http://159.65.152.85:4000"+path.resolve("./firmware/"+newFile+".txt"),
+                URL : "http://159.65.152.85:4000/download/"+newFile+".txt",
                 Checksum : checksumReturn
             }
             res.send(response);
@@ -109,7 +169,7 @@ app.post('/getVersionUpdates', function (req, res) {
             Result : "No Updates Available, You are upto date"
         }
         res.send(response);
-    })
+    })*/
 })
 
 
