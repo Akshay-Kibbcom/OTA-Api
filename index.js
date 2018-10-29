@@ -119,6 +119,7 @@ app.post('/getVersionUpdates', function (req, res) {
                         generateChecksum(data); 
                         console.log(checksumReturn)  
                         var response={
+                                confirmed : 0,
                                 Result : "New Updates Available",
                                 URL : "http://159.65.152.85:4000/download/"+newFile,
                                 Checksum : checksumReturn
@@ -132,6 +133,7 @@ app.post('/getVersionUpdates', function (req, res) {
         }
         else{
             var response ={
+                confirmed : 0,
                 Result : "No Updates Available, You are upto date"
             }
             res.send(response);
