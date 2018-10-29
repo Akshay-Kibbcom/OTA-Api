@@ -114,15 +114,22 @@ app.post('/getVersionUpdates', function (req, res) {
                         console.log("Update file name : "+file);
                         newFile=file;
                         console.log("./firmware/"+newFile)
+                        // Get File Size
+                        const stats = fs.statSync("./firmware/"+newFile)
+                        const fileSizeInBytes = stats.size
+                        //Convert the file size to megabytes (optional)
+                        //const fileSizeInMegabytes = fileSizeInBytes / 1000000.0
+
                         fs.readFile('./firmware/'+newFile, function(err, data) {
                         console.log(data)
                         generateChecksum(data); 
                         console.log(checksumReturn)  
                         var response={
-                                confirmed : 0,
+                                Confirmed : 0,
                                 Result : "New Updates Available",
                                 URL : "http://159.65.152.85:4000/download/"+newFile,
-                                Checksum : checksumReturn
+                                Checksum : checksumReturn,
+                                Filesize : fileSizeInBytes
                             }
                             res.send(response);
                         });
@@ -133,7 +140,7 @@ app.post('/getVersionUpdates', function (req, res) {
         }
         else{
             var response ={
-                confirmed : 0,
+                Confirmed : 1,
                 Result : "No Updates Available, You are upto date"
             }
             res.send(response);
