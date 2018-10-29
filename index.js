@@ -89,15 +89,15 @@ function getMaxVer()
 // Get New Version is available of not.
 app.post('/getVersionUpdates', function (req, res) {
     var body=req.body;
-    var filename= body.filename;
+    var filename= body.currentVersion;
     console.log("File in URL Body is : "+filename)
 
-    // Truncate the Extn
+    /*// Truncate the Extn
     var filname= filename.slice(0,-4);
     console.log("File without EXTN "+filname);
+    */
 
-
-    var lastChar = filname.split("_")
+    var lastChar = filename.split("_")
     lastChar=lastChar[1];
     console.log(lastChar);
     var ver= parseInt(lastChar)
