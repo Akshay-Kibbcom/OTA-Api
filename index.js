@@ -46,27 +46,16 @@ function getFileSize(filename)
         })
     });
 }
-app.post("/upload", function (req, res) {
-    upload(req, res, function (err) {
-        if (err) {
-            return res.end("Something went wrong!");
-        }
-        return res.end("File uploaded sucessfully!.");
-    });
 
-    var max=getMaxVer();
-    max.then(function(maxValue){
-
-    console.log(maxValue);
+function sendNotification()
+{
     // Get File Size
     //var filesize= getFileSize(maxValue);
     //console.log(filesize);
 
     // Build the post string from an object
     var post_data =JSON.stringify( {
-        "Result" : "New Fido Updates Available",
-        "Version": "v_"+maxValue,
-        "Filesize": 12345
+        "Result" : "New Fido Updates Available"
     })
 
     // An object of options to indicate where to post to
@@ -89,7 +78,17 @@ app.post("/upload", function (req, res) {
     post_req.write(post_data.toString());
     post_req.end();
 
+    
+}
+
+app.post("/upload", function (req, res) {
+    upload(req, res, function (err) {
+        if (err) {
+            return res.end("Something went wrong!");
+        }
+        return res.end("File uploaded sucessfully!.");
     });
+    sendNotification();
 });
 
 // Check File Exist or Not
@@ -130,6 +129,7 @@ function getMaxVer()
     var promise= new Promise(function(resolve,reject){
         fs.readdir(dir, (err, files) => {
             files.forEach(file => {
+                console.log(file)
                 var fname= file.slice(0, -4);
                 var ver= fname.split("_")
                 ver=ver[1];
