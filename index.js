@@ -5,6 +5,8 @@ var router = express.Router();
 var multer = require('multer');
 const fs = require('fs');
 var crypto = require('crypto');
+var querystring = require('querystring');
+var http = require('http');
 const dir = './firmware';
 var app = express()
 
@@ -27,12 +29,66 @@ app.get("/", function (req, res) {
     res.sendFile(__dirname + "/index.html");
 });
 
+function getFileSize(filename)
+{
+    fs.readdir(dir, (err, files) => {
+        files.forEach(file => {
+            if(file.indexOf(filename) == -1 ?false:true)
+            {
+                console.log("Update file name : "+file);
+                newFile=file;
+                console.log("./firmware/"+newFile)
+                // Get File Size
+                const stats = fs.statSync("./firmware/"+newFile)
+                const fileSizeInBytes = stats.size
+                return fileSizeInBytes;
+            }
+        })
+    });
+}
 app.post("/upload", function (req, res) {
     upload(req, res, function (err) {
         if (err) {
             return res.end("Something went wrong!");
         }
         return res.end("File uploaded sucessfully!.");
+    });
+
+    var max=getMaxVer();
+    max.then(function(maxValue){
+
+    console.log(maxValue);
+    // Get File Size
+    //var filesize= getFileSize(maxValue);
+    //console.log(filesize);
+
+    // Build the post string from an object
+    var post_data =JSON.stringify( {
+        "Result" : "New Fido Updates Available",
+        "Version": "v_"+maxValue,
+        "Filesize": 12345
+    })
+
+    // An object of options to indicate where to post to
+    var post_options = {
+        host: '159.65.152.85',
+        port: '8000',
+        path: '/newversion',
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            //'Content-Length': Buffer.byteLength(post_data)
+        }
+    }
+
+    // Set up the request
+    var post_req = http.request(post_options, function(res) {
+    });
+
+    // post the data
+    post_req.write(post_data.toString());
+    post_req.end();
+
     });
 });
 
