@@ -3,7 +3,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
     <meta charset="utf-8" />
-    <title>Upload images to server using Node JS</title>
+    <title>Upload Firmwares to server using Node JS</title>
     <script src="Scripts/jquery-3.1.1.min.js"></script>
     <script src="Scripts/jquery.form.min.js"></script>
     <script>
@@ -34,9 +34,15 @@
     </script>
 </head>
 <body>
+    <h1>Fido Firmware Upload</h1>
     <form id="frmUploader" enctype="multipart/form-data" action="/upload" method="post">
         <input type="file" name="imgUploader" multiple />
         <input type="submit" name="submit" id="btnSubmit" value="Upload" />
+    </form>
+    <h1>Camera Firmware Upload</h1>
+    <form id="frmCamUploader" enctype="multipart/form-data" action="/uploadCam" method="post">
+        <input type="file" name="camimgUploader" multiple />
+        <input type="submit" name="submit2" id="btnSubmit2" value="Upload" />
     </form>
 </body>
 </html>
