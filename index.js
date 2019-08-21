@@ -110,7 +110,7 @@ app.post("/uploadCam", function (req, res) {
         }
         return res.end("File uploaded sucessfully!.");
     });
-    //sendNotification();
+    sendNotification();
 });
 
 
@@ -297,7 +297,7 @@ app.post('/getVersionUpdates', async function (req, res) {
                             fidoFirmware_URL : fidoFirmURL,
                             fidoFirmware_Checksum : fidoCheckSum,
                             fidoFirmware_Filesize : fidoFirmSize,
-                            camFirmware_URL : "http://159.65.152.85:4000/download/"+newFile,
+                            camFirmware_URL : "http://159.65.152.85:4000/downloadCam/"+newFile,
                             camFirmware_Checksum : checksumReturn,
                             camFirmware_Filesize : fileSizeInBytes,
                         }
@@ -306,7 +306,7 @@ app.post('/getVersionUpdates', async function (req, res) {
                         var response={
                             Confirmed : 0,
                             Result : "New Updates Available",
-                            camFirmware_URL : "http://159.65.152.85:4000/download/"+newFile,
+                            camFirmware_URL : "http://159.65.152.85:4000/downloadCam/"+newFile,
                             camFirmware_Checksum : checksumReturn,
                             camFirmware_Filesize : fileSizeInBytes,
                         }
@@ -352,6 +352,22 @@ app.post('/getVersionUpdates', async function (req, res) {
 app.get('/download/:file(*)',(req, res) => {
     var file = req.params.file;
     fs.readFile('firmware/'+file, function (err, content) {
+        if (err) {
+            res.writeHead(400, {'Content-type':'text/html'})
+            console.log(err);
+            res.end("No such file");    
+        } else {
+            //specify Content will be an attachment
+            res.setHeader('Content-disposition', 'attachment; filename='+file);
+            res.end(content);
+        }
+    });
+  });
+
+  // Download a new Firmware
+app.get('/downloadCam/:file(*)',(req, res) => {
+    var file = req.params.file;
+    fs.readFile('camfirmware/'+file, function (err, content) {
         if (err) {
             res.writeHead(400, {'Content-type':'text/html'})
             console.log(err);
